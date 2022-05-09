@@ -13,12 +13,21 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
 }
 
 export function simplex(target: TargetFn, x: number[],
-                        control: Partial<SimplexControlParam> = {}) {
+                        control: Partial<SimplexControlParam> = {},
+                        maxIterations: number = 200) {
     const solver = new Simplex(target, x, control);
-    return solver.run();
+    return solver.run(maxIterations * x.length);
 }
 
 export class Simplex {
+    // Standard simplex move control. We could put these in the control,
+    // but it does not seem ideal to make them tuneable really; we can
+    // always move them there later.
+    public static readonly rho = 1;
+    public static readonly chi = 2;
+    public static readonly psi = -0.5;
+    public static readonly sigma = 0.5;
+
     private _target: TargetFn;
     private _control: SimplexControlParam;
     private _simplex: Point[];
@@ -39,9 +48,9 @@ export class Simplex {
         for (let i = 0; i < this._n; ++i) {
             const p = x.slice();
             if (p[i]) {
-                p[i] *= (1 + this._control.nonZeroDelta);
+                p[i] *= (1 + this._control.deltaNonZero);
             } else {
-                p[i] = this._control.zeroDelta;
+                p[i] = this._control.deltaZero;
             }
             this._simplex.push(this._point(p));
         }
@@ -79,7 +88,7 @@ export class Simplex {
                 this._update(contracted);
             } else {
                 // if we don't contract here, we're done
-                if (this._control.sigma >= 1) {
+                if (Simplex.sigma >= 1) {
                     this._converged = true;
                     return true;
                 }
@@ -97,11 +106,14 @@ export class Simplex {
     }
 
     // not really meant to be used that much, it's a bit stupid
-    public run() {
-        const maxIterations = this._control.maxIterations * this._n;
-        for (let i = this._iterations; i < maxIterations; ++i) {
-            if (this.step()) {
-                break;
+    public run(maxIterations: number) {
+        if (!this._converged) {
+            for (let i = 0; i < maxIterations; ++i) {
+                // const p = this._simplex[0];
+                // console.log(`${i}: ${p.x} => ${p.fx}`);
+                if (this.step()) {
+                    break;
+                }
             }
         }
         return this.result();
@@ -116,7 +128,8 @@ export class Simplex {
     }
 
     private _point(x: number[]): Point {
-        return {x, fx: this._target(x), id: this._id++};
+        const fx = this._target(x);
+        return {x, fx, id: this._id++};
     }
 
     private _sort() {
@@ -143,24 +156,24 @@ export class Simplex {
 
     // Various "moves"
     private _reflect(x: Point, centroid: number[]) {
-        return this._point(weightedSum(this._control.rho, centroid, x.x));
+        return this._point(weightedSum(Simplex.rho, centroid, x.x));
     }
 
     private _expand(x: Point, centroid: number[]) {
-        return this._point(weightedSum(this._control.chi, centroid, x.x));
+        return this._point(weightedSum(Simplex.chi, centroid, x.x));
     }
 
     private _contractInside(x: Point, centroid: number[]) {
-        return this._point(weightedSum(this._control.psi, centroid, x.x));
+        return this._point(weightedSum(Simplex.psi, centroid, x.x));
     }
 
     private _contractOutside(x: Point, centroid: number[]) {
-        return this._point(weightedSum(-this._control.psi * this._control.rho,
-                                      centroid, x.x));
+        return this._point(weightedSum(-Simplex.psi * Simplex.rho,
+                                       centroid, x.x));
     }
 
     private _reduce(x: Point, best: number[]) {
-        return this._point(weightedSum(-this._control.sigma, best, x.x));
+        return this._point(weightedSum(-Simplex.sigma, best, x.x));
     }
 
     private _isConverged() {
