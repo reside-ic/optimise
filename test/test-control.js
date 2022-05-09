@@ -17,11 +17,15 @@ describe("control parameters", () => {
         expect(x.deltaZero).to.eql(0.001);
     });
 
-
     it("accepts several parameters", () => {
         var x = control.simplexControl({deltaNonZero: 0.005,
                                         deltaZero: 0.01});
         expect(x.deltaNonZero).to.eql(0.005);
         expect(x.deltaZero).to.eql(0.01);
+    });
+
+    it("validates control parameters", () => {
+        expect(() => {control.simplexControl({minTolerance: -0.01});}).
+            to.throw("'minTolerance' must be strictly positive");
     });
 });

@@ -25,9 +25,6 @@ export function simplexControl(control: Partial<SimplexControlParam> = {}) {
                                   defaults.minTolerance),
     };
     // more checks might be worthwhile here, really.
-    // if (ret.maxIterations < 1) {
-    //     throw controlError("maxIterations", "must be at least 1");
-    // }
     if (ret.minTolerance <= 0) {
         throw controlError("minTolerance", "must be strictly positive");
     }
