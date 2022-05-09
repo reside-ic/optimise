@@ -87,14 +87,10 @@ export class Simplex {
             if (contracted.fx < worst.fx) {
                 this._update(contracted);
             } else {
-                // if we don't contract here, we're done
-                if (Simplex.sigma >= 1) {
-                    this._converged = true;
-                    return true;
-                }
-                // otherwise, do a reduction (all points towards best)
+                // If Simplex.sigma here was ever more than 1, we should exit
+                // Do a reduction (all points towards best)
                 for (let i = 1; i <= n; ++i) {
-                    this._simplex[i] = this._reduce(this._simplex[i], best.x);
+                    this._simplex[i] = this._shrink(this._simplex[i], best.x);
                 }
                 this._sort();
             }
@@ -105,12 +101,10 @@ export class Simplex {
         return false;
     }
 
-    // not really meant to be used that much, it's a bit stupid
+    // not really meant to be used that much, it's a bit basic
     public run(maxIterations: number) {
         if (!this._converged) {
             for (let i = 0; i < maxIterations; ++i) {
-                // const p = this._simplex[0];
-                // console.log(`${i}: ${p.x} => ${p.fx}`);
                 if (this.step()) {
                     break;
                 }
@@ -172,7 +166,7 @@ export class Simplex {
                                        centroid, x.x));
     }
 
-    private _reduce(x: Point, best: number[]) {
+    private _shrink(x: Point, best: number[]) {
         return this._point(weightedSum(-Simplex.sigma, best, x.x));
     }
 

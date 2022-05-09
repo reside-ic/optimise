@@ -27,7 +27,6 @@ describe('optimise simple problem', () => {
     });
 });
 
-
 describe('configure initial simplex', () => {
     var target = (x) => x.map(x => x * x).reduce((a, b) => a + b, 0);
 
@@ -47,3 +46,21 @@ describe('configure initial simplex', () => {
         expect(obj._simplex[2].x).to.eql([0, 3]);
     });
 })
+
+describe('optimise banana', () => {
+    var expect = require("chai").expect;
+    var simplex = require("../lib/simplex.js");
+    var control = require("../lib/control.js");
+    var banana = function(x, y, a, b) {
+        return (a - x)**2 + b * (y - x * x)**2;
+    }
+    var target = (x) => banana(x[0], x[1], 1, 100);
+    var ctl = control.simplexControl({deltaNonZero: 0.5});
+    var res = new simplex.simplex(target, [-1.5, 1], ctl, 1000);
+
+    for (var i = 0; i < 100; ++i) {
+        var x = [Math.random() * 4 - 2, Math.random() * 4 - 2];
+        console.log(x);
+        var res = new simplex.simplex(target, [-1.5, 1], ctl, 1000);
+    }
+});
