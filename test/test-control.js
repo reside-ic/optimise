@@ -7,8 +7,7 @@ describe("control parameters", () => {
         var x = control.simplexControl();
         expect(x.deltaNonZero).to.eql(0.05);
         expect(x.deltaZero).to.eql(0.001);
-        expect(x.minErrorDelta).to.eql(0.000001);
-        expect(x.minTolerance).to.eql(0.00001);
+        expect(x.tolerance).to.eql(0.00001);
     });
 
     it("accepts one new parameter", () => {
@@ -25,7 +24,7 @@ describe("control parameters", () => {
     });
 
     it("validates control parameters", () => {
-        expect(() => {control.simplexControl({minTolerance: -0.01});}).
-            to.throw("'minTolerance' must be strictly positive");
+        expect(() => {control.simplexControl({tolerance: -0.01});}).
+            to.throw("'tolerance' must be strictly positive");
     });
 });

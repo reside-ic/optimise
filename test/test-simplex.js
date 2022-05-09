@@ -4,7 +4,7 @@ var expect = require("chai").expect;
 var simplex = require("../lib/simplex.js");
 var control = require("../lib/control.js");
 
-describe('optimise simple problem', () => {
+describe("optimise simple problem", () => {
     // multivariate quadratic
     var target = (x) => x.map(x => x * x).reduce((a, b) => a + b, 0);
 
@@ -27,7 +27,7 @@ describe('optimise simple problem', () => {
     });
 });
 
-describe('configure initial simplex', () => {
+describe("configure initial simplex", () => {
     var target = (x) => x.map(x => x * x).reduce((a, b) => a + b, 0);
 
     it("starting points away from zero are scaled", () => {
@@ -47,20 +47,13 @@ describe('configure initial simplex', () => {
     });
 })
 
-describe('optimise banana', () => {
-    var expect = require("chai").expect;
-    var simplex = require("../lib/simplex.js");
-    var control = require("../lib/control.js");
+describe("high level interface", () => {
     var banana = function(x, y, a, b) {
         return (a - x)**2 + b * (y - x * x)**2;
     }
     var target = (x) => banana(x[0], x[1], 1, 100);
-    var ctl = control.simplexControl({deltaNonZero: 0.5});
+    var ctl = control.simplexControl({deltaNonZero: 0.5, tolerance: 1e-3});
     var res = new simplex.simplex(target, [-1.5, 1], ctl, 1000);
-
-    for (var i = 0; i < 100; ++i) {
-        var x = [Math.random() * 4 - 2, Math.random() * 4 - 2];
-        console.log(x);
-        var res = new simplex.simplex(target, [-1.5, 1], ctl, 1000);
-    }
+    expect(res.converged).to.be.true;
+    expect(res.fx).to.be.at.most(1e-3);
 });

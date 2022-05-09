@@ -87,8 +87,8 @@ export class Simplex {
             if (contracted.fx < worst.fx) {
                 this._update(contracted);
             } else {
-                // If Simplex.sigma here was ever more than 1, we should exit
-                // Do a reduction (all points towards best)
+                // NOTE: this is very hard to trigger, requiring
+                // specific features of the target function.
                 for (let i = 1; i <= n; ++i) {
                     this._simplex[i] = this._shrink(this._simplex[i], best.x);
                 }
@@ -114,11 +114,13 @@ export class Simplex {
     }
 
     public result() {
-        return {x: this._simplex[0].x,
-                fx: this._simplex[0].fx,
-                iterations: this._iterations,
-                evaluations: this._id,
-                converged: this._converged};
+        return {
+            converged: this._converged,
+            evaluations: this._id,
+            fx: this._simplex[0].fx,
+            iterations: this._iterations,
+            x: this._simplex[0].x,
+        };
     }
 
     private _point(x: number[]): Point {
@@ -171,15 +173,18 @@ export class Simplex {
     }
 
     private _isConverged() {
-        const s = this._simplex;
-        const ctl = this._control;
+        const tolerance = this._control.tolerance;
+        const best = this._simplex[0];
+        const worst = this._simplex[this._n];
+        const objectiveSame = worst.fx - best.fx < tolerance ||
+            1 - best.fx / worst.fx < tolerance;
+
         let maxDiff = 0.0;
         for (let i = 0; i < this._n; ++i) {
-            maxDiff = Math.max(maxDiff, Math.abs(s[0].x[i] - s[1].x[i]));
+            maxDiff = Math.max(maxDiff, Math.abs(best.x[i] - worst.x[i]));
         }
 
-        const a = (Math.abs(s[0].fx - s[this._n].fx) < ctl.minErrorDelta);
-        const b = maxDiff < ctl.minTolerance;
-        return a && b;
+        const hasShrunk = maxDiff < tolerance;
+        return hasShrunk && objectiveSame;
     }
 }
