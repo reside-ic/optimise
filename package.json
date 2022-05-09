@@ -1,0 +1,37 @@
+{
+    "name": "simplex",
+    "version": "0.0.1",
+    "description": "Simplex (Nelder Mead) Optimisation",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "files": [
+        "/lib"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "test": "nyc mocha",
+        "lint": "tslint -c tslint.json 'src/**/*.ts'",
+        "posttest": "nyc report --reporter=json"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/reside-ic/simplex-js.git"
+    },
+    "author": "Rich FitzJohn <rich.fitzjohn@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/reside-ic/simplex-js/issues"
+    },
+    "homepage": "https://github.com/reside-ic/simplex-js#readme",
+    "devDependencies": {
+        "@types/chai": "^4.2.11",
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^10.17.19",
+        "chai": "^4.2.0",
+        "mocha": "^10.0.0",
+        "nyc": "^15.0.1",
+        "ts-node": "^7.0.1",
+        "tslint": "^5.20.1",
+        "typescript": "^3.8.3"
+    }
+}
