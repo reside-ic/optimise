@@ -1,1 +1,1 @@
-export { simplex } from "./simplex";
+export { Simplex, simplex } from "./simplex";
