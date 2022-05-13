@@ -6,7 +6,7 @@ var control = require("../lib/control.js");
 
 describe("optimise simple problem", () => {
     // multivariate quadratic
-    var target = (x) => ({fx: x.map(x => x * x).reduce((a, b) => a + b, 0)});
+    var target = x => x.map(x => x * x).reduce((a, b) => a + b, 0);
 
     it("can construct a new optimiser", () => {
         var obj = new simplex.Simplex(target, [2, 4]);
@@ -28,7 +28,7 @@ describe("optimise simple problem", () => {
 });
 
 describe("configure initial simplex", () => {
-    var target = (x) => ({fx: x.map(x => x * x).reduce((a, b) => a + b, 0)});
+    var target = x => x.map(x => x * x).reduce((a, b) => a + b, 0);
 
     it("starting points away from zero are scaled", () => {
         var ctl = control.simplexControl({deltaNonZero: 0.5});
@@ -55,7 +55,7 @@ describe("high level interface", () => {
     var banana = function(x, y, a, b) {
         return (a - x)**2 + b * (y - x * x)**2;
     }
-    var target = (x) => ({fx: banana(x[0], x[1], 1, 100)});
+    var target = x => banana(x[0], x[1], 1, 100);
     var ctl = control.simplexControl({deltaNonZero: 0.5, tolerance: 1e-3});
 
     var res = simplex.simplex(target, [-1.5, 1], ctl, 1000);

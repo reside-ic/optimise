@@ -1,5 +1,5 @@
 import {simplexControl, SimplexControlParam} from "./control";
-import {Point, Result, TargetFn} from "./types";
+import {checkResult, Point, Result, TargetFn} from "./types";
 
 function weightedSum(w: number, v1: number[], v2: number[]) {
     const n = v1.length;
@@ -126,7 +126,7 @@ export class Simplex {
     }
 
     private _point(x: number[]): Point {
-        const result = this._target(x);
+        const result = checkResult(this._target(x));
         return {x, fx: result.fx, data: result.data, id: this._id++};
     }
 
