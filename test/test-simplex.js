@@ -48,10 +48,6 @@ describe("configure initial simplex", () => {
 })
 
 describe("high level interface", () => {
-    var expect = require("chai").expect;
-    var simplex = require("../lib/simplex.js");
-    var control = require("../lib/control.js");
-
     var banana = function(x, y, a, b) {
         return (a - x)**2 + b * (y - x * x)**2;
     }
