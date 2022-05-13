@@ -12,7 +12,7 @@ export interface Point {
 
 export type TargetFn = (x: number[]) => number | Result;
 
-export function checkResult(x: number | Result) : Result {
+export function checkResult(x: number | Result): Result {
     if (typeof x === "number") {
         return {fx: x, data: null};
     }
