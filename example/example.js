@@ -13,7 +13,7 @@ function showSimplex(id, obj) {
 async function runFit(idInputs, idPlot, target, delayMs) {
     const inputs = idInputs.map(el => document.getElementById(el));
     var location = inputs.map(el => parseFloat(el.value));
-    var obj = new simplex.Simplex(target, location, {});
+    var obj = new optimise.Simplex(target, location, {});
 
     for (;;) {
         obj.step();

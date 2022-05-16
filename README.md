@@ -1,15 +1,15 @@
-## Simplex method in javascript
+## Derivative-free optimisation in javascript
 
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-[![build status](https://github.com/reside-ic/simplex-js/workflows/ci/badge.svg)](https://github.com/reside-ic/simplex-js/actions)
-[![codecov.io](https://codecov.io/github/reside-ic/simplex-js/coverage.svg?branch=master)](https://codecov.io/github/reside-ic/simplex-js?branch=master)
+[![build status](https://github.com/reside-ic/optimise/workflows/ci/badge.svg)](https://github.com/reside-ic/optimise/actions)
+[![codecov.io](https://codecov.io/github/reside-ic/optimise/coverage.svg?branch=master)](https://codecov.io/github/reside-ic/optimise?branch=master)
 
 Very simple optimisation, using the [Simplex (Nelder-Mead) method](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
 
 We provide two interfaces. In the first, you can optimise a function in a single go:
 
 ```
-const point = simplex.simplex(target, start);
+const point = optimise.simplex(target, start);
 ```
 
 which will look for the minimum of the vector-valued function `target`, starting from location `start`. The return value will be an object with fields:
@@ -24,7 +24,7 @@ which will look for the minimum of the vector-valued function `target`, starting
 Running the optimisation may take a while, and no information can be retrieved while it runs, so we also provide a more stateful interface. The function above can be implemented as:
 
 ```
-const opt = new simplex.Simplex(target, start)
+const opt = new optimise.Simplex(target, start)
 while (true) {
   if (opt.step()) {
     break;
