@@ -1,6 +1,6 @@
 {
-    "name": "optimise",
-    "version": "0.0.1",
+    "name": "dfoptim",
+    "version": "0.0.2",
     "description": "Derivative-Free Optimisation",
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
@@ -11,19 +11,19 @@
         "build": "tsc",
         "test": "nyc mocha",
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
-        "example": "browserify ./example/optimise.js.in > example/optimise.js",
+        "example": "browserify ./example/dfoptim.js.in > example/dfoptim.js",
         "posttest": "nyc report --reporter=json"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/reside-ic/optimise.git"
+        "url": "git+https://github.com/reside-ic/dfoptim.git"
     },
     "author": "Rich FitzJohn <rich.fitzjohn@gmail.com>",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/reside-ic/optimise/issues"
+        "url": "https://github.com/reside-ic/dfoptim/issues"
     },
-    "homepage": "https://github.com/reside-ic/optimise#readme",
+    "homepage": "https://github.com/reside-ic/dfoptim#readme",
     "devDependencies": {
         "@types/chai": "^4.2.11",
         "@types/mocha": "^5.2.7",
