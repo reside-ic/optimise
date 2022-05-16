@@ -1,0 +1,1 @@
+global.simplex = require("../lib/simplex");
