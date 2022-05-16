@@ -125,6 +125,10 @@ export class Simplex {
         };
     }
 
+    public simplex() {
+        return this._simplex.map((el) => ({x: el.x, fx: el.fx}));
+    }
+
     private _point(x: number[]): Point {
         const result = checkResult(this._target(x));
         return {x, fx: result.fx, data: result.data, id: this._id++};

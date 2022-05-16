@@ -4,6 +4,8 @@
 [![build status](https://github.com/reside-ic/simplex-js/workflows/ci/badge.svg)](https://github.com/reside-ic/simplex-js/actions)
 [![codecov.io](https://codecov.io/github/reside-ic/simplex-js/coverage.svg?branch=master)](https://codecov.io/github/reside-ic/simplex-js?branch=master)
 
+Very simple optimisation, using the [Simplex (Nelder-Mead) method](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
+
 ## Licence
 
 MIT © Imperial College of Science, Technology and Medicine
