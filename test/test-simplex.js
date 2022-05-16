@@ -11,8 +11,8 @@ describe("optimise simple problem", () => {
     it("can construct a new optimiser", () => {
         var obj = new simplex.Simplex(target, [2, 4]);
         var res = obj.result();
-        expect(res.x).to.eql([2, 4]);
-        expect(res.fx).to.eql(20);
+        expect(res.location).to.eql([2, 4]);
+        expect(res.value).to.eql(20);
         expect(res.iterations).to.eql(0);
         expect(res.evaluations).to.eql(3);
         expect(res.converged).to.be.false;
@@ -22,8 +22,8 @@ describe("optimise simple problem", () => {
         var obj = new simplex.Simplex(target, [2, 4]);
         var res = obj.run(100);
         expect(res.converged).to.be.true;
-        expect(res.fx).to.be.at.least(0);
-        expect(res.fx).to.be.at.most(1e-5);
+        expect(res.value).to.be.at.least(0);
+        expect(res.value).to.be.at.most(1e-5);
     });
 });
 
@@ -34,18 +34,18 @@ describe("configure initial simplex", () => {
         var ctl = control.simplexControl({deltaNonZero: 0.5});
         var obj = new simplex.Simplex(target, [2, 4], ctl);
         const points = obj.simplex();
-        expect(points[0].x).to.eql([2, 4]);
-        expect(points[1].x).to.eql([3, 4]);
-        expect(points[2].x).to.eql([2, 6]);
+        expect(points[0].location).to.eql([2, 4]);
+        expect(points[1].location).to.eql([3, 4]);
+        expect(points[2].location).to.eql([2, 6]);
     });
 
     it("starting points at zero are scaled", () => {
         var ctl = control.simplexControl({deltaNonZero: 0.5, deltaZero: 0.1});
         var obj = new simplex.Simplex(target, [0, 2], ctl);
         const points = obj.simplex();
-        expect(points[0].x).to.eql([0, 2]);
-        expect(points[1].x).to.eql([0.1, 2]);
-        expect(points[2].x).to.eql([0, 3]);
+        expect(points[0].location).to.eql([0, 2]);
+        expect(points[1].location).to.eql([0.1, 2]);
+        expect(points[2].location).to.eql([0, 3]);
     });
 })
 
@@ -58,7 +58,7 @@ describe("high level interface", () => {
 
     var res = simplex.simplex(target, [-1.5, 1], ctl, 1000);
     expect(res.converged).to.be.true;
-    expect(res.fx).to.be.at.most(1e-3);
+    expect(res.value).to.be.at.most(1e-3);
 });
 
 describe("can accumulate additional information", () => {
@@ -72,13 +72,13 @@ describe("can accumulate additional information", () => {
         for (var i = 0; i < x.length; ++i) {
             tot += (c + m * x[i] - y[i])**2;
         }
-        return {fx: tot, data: x => x.map(el => c + m * el)};
+        return {value: tot, data: x => x.map(el => c + m * el)};
     }
 
     var res = new simplex.Simplex(target, [1, 1]);
     var ans = res.run(100);
-    expect(ans.x[0]).to.eql(0.4106600527809162);
-    expect(ans.x[1]).to.eql(0.5462435359499496);
+    expect(ans.location[0]).to.eql(0.4106600527809162);
+    expect(ans.location[1]).to.eql(0.5462435359499496);
     expect(ans.data(x)).eql(
-        x.map(el => ans.x[0] + ans.x[1] * el));
+        x.map(el => ans.location[0] + ans.location[1] * el));
 })

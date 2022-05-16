@@ -12,11 +12,11 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
     return ret;
 }
 
-export function simplex(target: TargetFn, x: number[],
+export function simplex(target: TargetFn, location: number[],
                         control: Partial<SimplexControlParam> = {},
                         maxIterations: number = 200) {
-    const solver = new Simplex(target, x, control);
-    return solver.run(maxIterations * x.length);
+    const solver = new Simplex(target, location, control);
+    return solver.run(maxIterations * location.length);
 }
 
 export class Simplex {
@@ -37,16 +37,16 @@ export class Simplex {
     private _id: number = 0;
     private _converged: boolean = false;
 
-    constructor(target: TargetFn, x: number[],
+    constructor(target: TargetFn, location: number[],
                 control: Partial<SimplexControlParam> = {}) {
         this._target = target;
         this._control = simplexControl(control);
-        this._n = x.length;
+        this._n = location.length;
 
         this._simplex = [];
-        this._simplex.push(this._point(x.slice()));
+        this._simplex.push(this._point(location.slice()));
         for (let i = 0; i < this._n; ++i) {
-            const p = x.slice();
+            const p = location.slice();
             if (p[i]) {
                 p[i] *= (1 + this._control.deltaNonZero);
             } else {
@@ -72,25 +72,27 @@ export class Simplex {
         // reflect the worst point past the centroid
         const reflected = this._reflect(worst, centroid);
 
-        if (reflected.fx < best.fx) {
+        if (reflected.value < best.value) {
             // if the reflected point is the best seen, then possibly
             // expand
             const expanded = this._expand(worst, centroid);
-            this._update(expanded.fx < reflected.fx ? expanded : reflected);
-        } else if (reflected.fx >= this._simplex[n - 1].fx) {
+            this._update(expanded.value < reflected.value ?
+                         expanded : reflected);
+        } else if (reflected.value >= this._simplex[n - 1].value) {
             // if the reflected point is worse than the second worst,
             // we need to contract
-            const contracted = reflected.fx > worst.fx ?
+            const contracted = reflected.value > worst.value ?
                   this._contractInside(worst, centroid) :
                   this._contractOutside(worst, centroid);
 
-            if (contracted.fx < worst.fx) {
+            if (contracted.value < worst.value) {
                 this._update(contracted);
             } else {
                 // NOTE: this is very hard to trigger, requiring
                 // specific features of the target function.
                 for (let i = 1; i <= n; ++i) {
-                    this._simplex[i] = this._shrink(this._simplex[i], best.x);
+                    this._simplex[i] = this._shrink(this._simplex[i],
+                                                    best.location);
                 }
                 this._sort();
             }
@@ -119,23 +121,29 @@ export class Simplex {
             converged: this._converged,
             data: best.data,
             evaluations: this._id,
-            fx: best.fx,
             iterations: this._iterations,
-            x: best.x,
+            location: best.location,
+            value: best.value,
         };
     }
 
     public simplex() {
-        return this._simplex.map((el) => ({x: el.x, fx: el.fx}));
+        return this._simplex.map(
+            (el) => ({location: el.location, value: el.value}));
     }
 
-    private _point(x: number[]): Point {
-        const result = checkResult(this._target(x));
-        return {x, fx: result.fx, data: result.data, id: this._id++};
+    private _point(location: number[]): Point {
+        const result = checkResult(this._target(location));
+        return {
+            data: result.data,
+            id: this._id++,
+            location,
+            value: result.value,
+        };
     }
 
     private _sort() {
-        this._simplex.sort((a, b) => a.fx - b.fx);
+        this._simplex.sort((a, b) => a.value - b.value);
     }
 
     private _centroid() {
@@ -144,7 +152,7 @@ export class Simplex {
         for (let i = 0; i < n; ++i) {
             ret[i] = 0;
             for (let j = 0; j < n; ++j) {
-                ret[i] += this._simplex[j].x[i];
+                ret[i] += this._simplex[j].location[i];
             }
             ret[i] /= n;
         }
@@ -157,37 +165,38 @@ export class Simplex {
     }
 
     // Various "moves"
-    private _reflect(x: Point, centroid: number[]) {
-        return this._point(weightedSum(Simplex.rho, centroid, x.x));
+    private _reflect(point: Point, centroid: number[]) {
+        return this._point(weightedSum(Simplex.rho, centroid, point.location));
     }
 
-    private _expand(x: Point, centroid: number[]) {
-        return this._point(weightedSum(Simplex.chi, centroid, x.x));
+    private _expand(point: Point, centroid: number[]) {
+        return this._point(weightedSum(Simplex.chi, centroid, point.location));
     }
 
-    private _contractInside(x: Point, centroid: number[]) {
-        return this._point(weightedSum(Simplex.psi, centroid, x.x));
+    private _contractInside(point: Point, centroid: number[]) {
+        return this._point(weightedSum(Simplex.psi, centroid, point.location));
     }
 
-    private _contractOutside(x: Point, centroid: number[]) {
+    private _contractOutside(point: Point, centroid: number[]) {
         return this._point(weightedSum(-Simplex.psi * Simplex.rho,
-                                       centroid, x.x));
+                                       centroid, point.location));
     }
 
-    private _shrink(x: Point, best: number[]) {
-        return this._point(weightedSum(-Simplex.sigma, best, x.x));
+    private _shrink(point: Point, best: number[]) {
+        return this._point(weightedSum(-Simplex.sigma, best, point.location));
     }
 
     private _isConverged() {
         const tolerance = this._control.tolerance;
         const best = this._simplex[0];
         const worst = this._simplex[this._n];
-        const objectiveSame = worst.fx - best.fx < tolerance ||
-            1 - best.fx / worst.fx < tolerance;
+        const objectiveSame = worst.value - best.value < tolerance ||
+            1 - best.value / worst.value < tolerance;
 
         let maxDiff = 0.0;
         for (let i = 0; i < this._n; ++i) {
-            maxDiff = Math.max(maxDiff, Math.abs(best.x[i] - worst.x[i]));
+            maxDiff = Math.max(maxDiff,
+                               Math.abs(best.location[i] - worst.location[i]));
         }
 
         const hasShrunk = maxDiff < tolerance;
