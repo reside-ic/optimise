@@ -56,7 +56,7 @@ describe("high level interface", () => {
     var target = x => banana(x[0], x[1], 1, 100);
     var ctl = control.simplexControl({deltaNonZero: 0.5, tolerance: 1e-3});
 
-    var res = simplex.simplex(target, [-1.5, 1], ctl, 1000);
+    var res = simplex.fitSimplex(target, [-1.5, 1], ctl, 1000);
     expect(res.converged).to.be.true;
     expect(res.value).to.be.at.most(1e-3);
 });

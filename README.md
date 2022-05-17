@@ -9,7 +9,7 @@ Very simple optimisation, using the [Simplex (Nelder-Mead) method](https://en.wi
 We provide two interfaces. In the first, you can dfoptim a function in a single go:
 
 ```
-const point = dfoptim.simplex(target, start);
+const point = dfoptim.fitSimplex(target, start);
 ```
 
 which will look for the minimum of the vector-valued function `target`, starting from location `start`. The return value will be an object with fields:
@@ -53,7 +53,7 @@ function target(theta) {
 }
 ```
 
-This can be passed through to `simplex` or `Simplex` above, and the `data` element of the result will contain the predictor function at the best point.
+This can be passed through to `fitSimplex` or `Simplex` above, and the `data` element of the result will contain the predictor function at the best point.
 
 ## Example
 

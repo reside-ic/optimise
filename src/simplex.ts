@@ -12,9 +12,9 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
     return ret;
 }
 
-export function simplex(target: TargetFn, location: number[],
-                        control: Partial<SimplexControlParam> = {},
-                        maxIterations: number = 200) {
+export function fitSimplex(target: TargetFn, location: number[],
+                           control: Partial<SimplexControlParam> = {},
+                           maxIterations: number = 200) {
     const solver = new Simplex(target, location, control);
     return solver.run(maxIterations * location.length);
 }

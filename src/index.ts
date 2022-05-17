@@ -1,1 +1,1 @@
-export { Simplex, simplex } from "./simplex";
+export { Simplex, fitSimplex } from "./simplex";
