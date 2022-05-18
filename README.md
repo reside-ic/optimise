@@ -69,7 +69,7 @@ Run
 
 ```
 npm run build
-npm run example
+npm run webpack
 ```
 
 Then open `example/index.html` for a simple example.
