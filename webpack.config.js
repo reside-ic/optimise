@@ -16,6 +16,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js'],
     },
     output: {
+        library: 'dfoptim',
         filename: 'dfoptim.js',
         path: path.resolve(__dirname, 'dist'),
     },
