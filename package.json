@@ -9,6 +9,7 @@
     ],
     "scripts": {
         "build": "tsc",
+        "bundle": "webpack",
         "test": "jest -c jest.config.js",
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
         "example": "browserify ./example/dfoptim.js.in > example/dfoptim.js"
@@ -27,7 +28,10 @@
         "@types/jest": "^27.5.1",
         "jest": "^25.2.1",
         "ts-jest": "^25.2.1",
+        "ts-loader": "^9.3.0",
         "tslint": "^5.20.1",
-        "typescript": "^3.8.2"
+        "typescript": "^3.8.2",
+        "webpack": "^5.72.1",
+        "webpack-cli": "^4.9.2"
     }
 }
