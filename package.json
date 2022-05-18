@@ -1,0 +1,37 @@
+{
+    "name": "dfoptim",
+    "version": "0.0.2",
+    "description": "Derivative-Free Optimisation",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "files": [
+        "/lib"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "webpack": "webpack",
+        "test": "jest -c jest.config.js",
+        "lint": "tslint -c tslint.json 'src/**/*.ts'",
+        "postwebpack": "cp dist/dfoptim.js example/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/reside-ic/dfoptim.git"
+    },
+    "author": "Rich FitzJohn <rich.fitzjohn@gmail.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/reside-ic/dfoptim/issues"
+    },
+    "homepage": "https://github.com/reside-ic/dfoptim#readme",
+    "devDependencies": {
+        "@types/jest": "^27.5.1",
+        "jest": "^25.2.1",
+        "ts-jest": "^25.2.1",
+        "ts-loader": "^9.3.0",
+        "tslint": "^5.20.1",
+        "typescript": "^3.8.2",
+        "webpack": "^5.72.1",
+        "webpack-cli": "^4.9.2"
+    }
+}
