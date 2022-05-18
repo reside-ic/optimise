@@ -9,10 +9,10 @@
     ],
     "scripts": {
         "build": "tsc",
-        "bundle": "webpack",
+        "webpack": "webpack",
         "test": "jest -c jest.config.js",
         "lint": "tslint -c tslint.json 'src/**/*.ts'",
-        "example": "browserify ./example/dfoptim.js.in > example/dfoptim.js"
+        "postwebpack": "cp dist/dfoptim.js example/"
     },
     "repository": {
         "type": "git",
