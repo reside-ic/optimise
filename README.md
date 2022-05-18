@@ -39,21 +39,23 @@ Where
 * The `step()` method advances the algorithm one step, which will take one or two evaluations of the target function and may or may not find a better point than our current best. It returns `true` if we have converged.
 * The `result()` method returns the object described above.
 
-Sometimes, it is useful to get additional information out of the target function and store it alongside the solution. For example, if fitting a model to data you might end up with a sum-of-squares error used for target fitting, but the model values themselves are of interest. For linear regression (which you would fit with a different packge!) we might do this by returning a closure that could be evaluated at any `x` position:
+Sometimes, it is useful to get additional information out of the target function and store it alongside the solution. For example, if fitting a model to data you might end up with a sum-of-squares error used for target fitting, but the model values themselves are of interest. For linear regression we might do this by returning a closure that could be evaluated at any `x` position:
 
 ```
+const xObserved = [0, 1, 2, 3, 4];
+const yObserved = [0.64, 2.41, 4.29, 6.62, 8.31]
 function target(theta) {
     const c = theta[0]; // intercept
     const m = theta[1]; // slope
     var tot = 0;
-    for (var i = 0; i < x.length; ++i) {
-        tot += (c + m * x[i] - y[i])**2;
+    for (var i = 0; i < xObserved.length; ++i) {
+        tot += (c + m * xObserved[i] - yObserved[i])**2;
     }
     return {value: tot, data: (x) => x.map(el => c + m * el)};
 }
 ```
 
-This can be passed through to `fitSimplex` or `Simplex` above, and the `data` element of the result will contain the predictor function at the best point.
+This can be passed through to `fitSimplex` or `Simplex` above, and the `data` element of the result will contain the predictor function at the best point. (Do not fit linear regressions with this package - you can do that faster and more accurately with many other methods.)
 
 There are a few control parameters that can be passed via an object as the third argument to `fitSimplex` or `Simplex`
 
