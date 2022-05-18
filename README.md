@@ -27,10 +27,8 @@ Running the optimisation may take a while, and no information can be retrieved w
 
 ```
 const opt = new dfoptim.Simplex(target, start)
-while (true) {
-  if (opt.step()) {
-    break;
-  }
+while (!opt.step()) {
+  // do something
 }
 const point = opt.result();
 ```
