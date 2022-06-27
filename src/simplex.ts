@@ -25,7 +25,7 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
  *
  * @param maxIterations The maximum number of iterations, per
  * dimension, of the algorithm (calls to {@link Simplex.step |
- * `Simplex.step()`} to take. For example, if you pass `maxIterations`
+ * `Simplex.step()`}) to take. For example, if you pass `maxIterations`
  * of 200 and are solving a problem where `location.length` is 5,
  * you'll take a maximum of 1000 steps in total. If we converge before
  * hitting this number we will return early.
