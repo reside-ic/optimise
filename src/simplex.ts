@@ -282,9 +282,6 @@ export class Simplex {
     }
 
     private _isConverged() {
-        if (this._converged) {
-            return true;
-        }
         const tolerance = this._control.tolerance;
         const best = this._simplex[0];
         const worst = this._simplex[this._n];
