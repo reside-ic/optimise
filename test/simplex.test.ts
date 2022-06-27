@@ -83,3 +83,30 @@ describe("can accumulate additional information", () => {
     expect(ans.data(x)).toEqual(
         x.map((el: number) => ans.location[0] + ans.location[1] * el));
 })
+
+describe("can cope with errors thrown in the target function", () => {
+    const target = (theta: number[]) => {
+        if (Math.min(...theta) < 0) {
+            throw Error("Negative values not allowed");
+        }
+        return theta.map((x: number) => x * x)
+            .reduce((a: number, b:number) => a + b, 0);
+    }
+
+    it("minimises correctly, even with errors", () => {
+        const obj = new Simplex(target, [2, 4]);
+        const result = obj.run(100);
+        expect(result.converged).toBe(true);
+        expect(result.value).toBeCloseTo(0);
+    });
+
+    it("throws if control does not prevent it", () => {
+        const obj = new Simplex(target, [2, 4], {errorOnFailure: true});
+        expect(() => obj.run(100)).toThrow("Negative values not allowed");
+    });
+
+    it("throws if starting value not valid, regardless of control", () => {
+        expect(() => new Simplex(target, [2, -4], {errorOnFailure: false}))
+            .toThrow("Negative values not allowed");
+    });
+});
