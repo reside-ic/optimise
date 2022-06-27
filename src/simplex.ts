@@ -167,14 +167,14 @@ export class Simplex {
     /**
      * Helper function to run the algorithm until converged. This is
      * very basic and not really intended to be used - you should
-     * probably build logic around [[`Simplex.step`]] directly, or if
-     * you want a simple interface use the [[`fitSimplex`]] function.
+     * probably build logic around {@link Simplex.step} directly, or if
+     * you want a simple interface use the {@link fitSimplex} function.
      *
      * @param maxIterations The maximum number of iterations of the
-     * algorithm (calls to [[`Simplex.step`]] to take. If we converge
+     * algorithm (calls to {@link Simplex.step} to take. If we converge
      * before hitting this number we will return early.
      *
-     * @return The same object as [[`Simplex.result`]]. Note that the
+     * @return The same object as {@link Simplex.result}. Note that the
      * algorithm may not have converged, so you should check the
      * `.converged` field.
      */
