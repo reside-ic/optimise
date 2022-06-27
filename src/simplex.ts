@@ -12,6 +12,26 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
     return ret;
 }
 
+/**
+ * Run the Simplex algorithm on a target function. This is a
+ * convenience function and offers little control but a compact
+ * interface.
+ *
+ * @param target The function to be minimised
+ *
+ * @param location The initial location to start the search from
+ *
+ * @param control Control parameters, as an object
+ *
+ * @param maxIterations The maximum number of iterations, per
+ * dimension, of the algorithm (calls to {@link Simplex.step |
+ * `Simplex.step()`}) to take. For example, if you pass `maxIterations`
+ * of 200 and are solving a problem where `location.length` is 5,
+ * you'll take a maximum of 1000 steps in total. If we converge before
+ * hitting this number we will return early.
+ *
+ * @returns See {@link Simplex.result | `Simplex.result`} for details
+ */
 export function fitSimplex(target: TargetFn, location: number[],
                            control: Partial<SimplexControlParam> = {},
                            maxIterations: number = 200) {
@@ -19,14 +39,39 @@ export function fitSimplex(target: TargetFn, location: number[],
     return solver.run(maxIterations * location.length);
 }
 
+/**
+ * Start, improve and interrogate an optimisation. Unlike
+ * {@link fitSimplex}, which does this in a single step, the `Simplex`
+ * class creates mutable state representing a (potentially)
+ * partially-completed optimisation process, which you are then
+ * responsible for pushing around in a loop. This means that if the
+ * optimisation is slow and you want to make it cancelleable, or if
+ * you want to report back anything about the progress of the
+ * optimsiation, you are free to do so as you'll only ever hit a
+ * method here for as long as it takes to call your `target` function
+ * a few times.
+ *
+ * @example
+ * ```typescript
+ * var banana = function(x: number, y: number, a: number, b: number) {
+ *   return (a - x)**2 + b * (y - x * x)**2;
+ * };
+ * var obj = Simplex(
+ *             (loc: number[]) => banana(loc[0], loc[1], 1, 100),
+ *             [-2, -2]);
+ * obj.result();
+ * obj.step();
+ * obj.run(10);
+ * ```
+ */
 export class Simplex {
     // Standard simplex move control. We could put these in the control,
     // but it does not seem ideal to make them tuneable really; we can
     // always move them there later.
-    public static readonly rho = 1;
-    public static readonly chi = 2;
-    public static readonly psi = -0.5;
-    public static readonly sigma = 0.5;
+    private readonly rho = 1;
+    private readonly chi = 2;
+    private readonly psi = -0.5;
+    private readonly sigma = 0.5;
 
     private _target: TargetFn;
     private _control: SimplexControlParam;
@@ -37,6 +82,13 @@ export class Simplex {
     private _id: number = 0;
     private _converged: boolean = false;
 
+    /**
+     * @param target The function to be minimised
+     *
+     * @param location The initial location to start the search from
+     *
+     * @param control Control parameters, as an object
+     */
     constructor(target: TargetFn, location: number[],
                 control: Partial<SimplexControlParam> = {}) {
         this._target = target;
@@ -57,6 +109,15 @@ export class Simplex {
         this._sort();
     }
 
+    /**
+     * Advance the optimiser one "step" of the algorithm. This will
+     * usually evaluate `target` once or twice, depending on if
+     * proposal finds an improved point or not.
+     *
+     * @return `true` if the algorithm has converged, `false`
+     * otherwise. For details about the best point so far, see
+     * {@link Simplex.result}
+     */
     public step() {
         this._iterations++;
         if (this._isConverged()) {
@@ -103,7 +164,20 @@ export class Simplex {
         return false;
     }
 
-    // not really meant to be used that much, it's a bit basic
+    /**
+     * Helper function to run the algorithm until converged. This is
+     * very basic and not really intended to be used - you should
+     * probably build logic around {@link Simplex.step} directly, or if
+     * you want a simple interface use the {@link fitSimplex} function.
+     *
+     * @param maxIterations The maximum number of iterations of the
+     * algorithm (calls to {@link Simplex.step} to take. If we converge
+     * before hitting this number we will return early.
+     *
+     * @return The same object as {@link Simplex.result}. Note that the
+     * algorithm may not have converged, so you should check the
+     * `.converged` field.
+     */
     public run(maxIterations: number) {
         if (!this._converged) {
             for (let i = 0; i < maxIterations; ++i) {
@@ -115,18 +189,39 @@ export class Simplex {
         return this.result();
     }
 
+    /**
+     * Return information about the best found point so far.
+     */
     public result() {
         const best = this._simplex[0];
         return {
+            /** Has the algorithm converged? */
             converged: this._converged,
+            /** Any additional data returned by the target function,
+             *  for this point
+             */
             data: best.data,
+            /** The number of times that `target` has been called so far */
             evaluations: this._id,
+            /** The number of times that {@link Simplex.step} has been
+             *  called so far
+             */
             iterations: this._iterations,
+            /** The best found location */
             location: best.location,
+            /** The value of `target(location)` */
             value: best.value,
         };
     }
 
+    /**
+     * Returns an array of the points that make up the Simplex. This
+     * is primarily provided for visualisation or debugging, but it
+     * could also be used to derive alternative early exit criteria.
+     *
+     * @return An array of objects, sorted from best to worst. Each
+     * object has fields `location` and `value`.
+     */
     public simplex() {
         return this._simplex.map(
             (el) => ({location: el.location, value: el.value}));
@@ -166,24 +261,24 @@ export class Simplex {
 
     // Various "moves"
     private _reflect(point: Point, centroid: number[]) {
-        return this._point(weightedSum(Simplex.rho, centroid, point.location));
+        return this._point(weightedSum(this.rho, centroid, point.location));
     }
 
     private _expand(point: Point, centroid: number[]) {
-        return this._point(weightedSum(Simplex.chi, centroid, point.location));
+        return this._point(weightedSum(this.chi, centroid, point.location));
     }
 
     private _contractInside(point: Point, centroid: number[]) {
-        return this._point(weightedSum(Simplex.psi, centroid, point.location));
+        return this._point(weightedSum(this.psi, centroid, point.location));
     }
 
     private _contractOutside(point: Point, centroid: number[]) {
-        return this._point(weightedSum(-Simplex.psi * Simplex.rho,
+        return this._point(weightedSum(-this.psi * this.rho,
                                        centroid, point.location));
     }
 
     private _shrink(point: Point, best: number[]) {
-        return this._point(weightedSum(-Simplex.sigma, best, point.location));
+        return this._point(weightedSum(-this.sigma, best, point.location));
     }
 
     private _isConverged() {
