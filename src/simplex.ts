@@ -198,12 +198,14 @@ export class Simplex {
             /** Has the algorithm converged? */
             converged: this._converged,
             /** Any additional data returned by the target function,
-             *  for this point */
+             *  for this point
+             */
             data: best.data,
             /** The number of times that `target` has been called so far */
             evaluations: this._id,
             /** The number of times that {@link Simplex.step} has been
-             * called so far */
+             *  called so far
+             */
             iterations: this._iterations,
             /** The best found location */
             location: best.location,
