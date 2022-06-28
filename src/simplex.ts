@@ -12,6 +12,16 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
     return ret;
 }
 
+function protect(target: TargetFn) {
+    return (location: number[]) => {
+        try {
+            return target(location);
+        } catch {
+            return Infinity;
+        }
+    };
+}
+
 /**
  * Run the Simplex algorithm on a target function. This is a
  * convenience function and offers little control but a compact
@@ -97,6 +107,12 @@ export class Simplex {
 
         this._simplex = [];
         this._simplex.push(this._point(location.slice()));
+
+        // Now that the first point has been run without error we can
+        // cope with any failure in the target function, if wanted:
+        if (!control.errorOnFailure) {
+            this._target = protect(target);
+        }
         for (let i = 0; i < this._n; ++i) {
             const p = location.slice();
             if (p[i]) {
