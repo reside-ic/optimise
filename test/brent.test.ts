@@ -1,4 +1,24 @@
-import { Brent, fitBrent } from "../src/brent";
+import { Brent, brentControl, fitBrent } from "../src/brent";
+
+describe("validate control", () => {
+    it("has known defaults", () => {
+        const ctl = brentControl({});
+        expect(ctl.findMax).toBe(false);
+        expect(ctl.tolerance).toBe(1e-6);
+        expect(Object.keys(ctl)).toEqual(["findMax", "tolerance"]);
+    });
+
+    it("can set values", () => {
+        const ctl = brentControl({findMax: true, tolerance: 1e-3});
+        expect(ctl.findMax).toBe(true);
+        expect(ctl.tolerance).toBe(1e-3);
+    });
+
+    it("requires positive tolerance", () => {
+        expect(() => brentControl({tolerance: 0}))
+            .toThrow("Invalid control parameter: 'tolerance' must be strictly positive");
+    })
+});
 
 describe("finds a minimum", () => {
     it("finds easy min", () => {
@@ -15,8 +35,19 @@ describe("finds a minimum", () => {
 
     it("can fail to converge", () => {
         const parabola = (x: number) => x * x;
-        const result = fitBrent(parabola, -2, 2, 1e-6, 3);
+        const result = fitBrent(parabola, -2, 2, {}, 3);
         expect(result.converged).toBe(false);
+    });
+});
+
+describe("finds a maximum", () => {
+    it("finds easy max", () => {
+        const parabola = (x: number) => 2 - x * x;
+        const control = {findMax: true};
+        const res = fitBrent(parabola, -3, 3, control);
+        expect(res.converged).toBe(true);
+        expect(res.location).toBeCloseTo(0);
+        expect(res.value).toBeCloseTo(2);
     });
 });
 

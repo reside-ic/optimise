@@ -1,4 +1,35 @@
 import { checkResult, Result, TargetFn1 } from "./types";
+import { invert, protect, withDefault } from "./utils";
+
+/**
+ * Control for the Brent algorithm. Only some of these (or, indeed none of
+ * these) can be provided to {@link Brent} or {@link fitBrent}
+ */
+export interface BrentControlParam {
+    /** Search for the maximum, rather than the minimum */
+    findMax: boolean;
+    /**
+     * The tolerance for the optimisation, used to guide the stopping
+     * criteria (see {@link Brent})
+     */
+    tolerance: number;
+}
+
+export function brentControl(control: Partial<BrentControlParam>) {
+    const defaults = {
+        findMax: false,
+        tolerance: 1e-6,
+    };
+    const ret = {
+        findMax: withDefault(control.findMax, defaults.findMax),
+        tolerance: withDefault(control.tolerance, defaults.tolerance),
+    };
+    if (ret.tolerance <= 0) {
+        throw new Error(
+            "Invalid control parameter: 'tolerance' must be strictly positive");
+    }
+    return ret;
+}
 
 /**
  * Run the Brent 1d minimisation on a target function. This is a
@@ -11,8 +42,7 @@ import { checkResult, Result, TargetFn1 } from "./types";
  *
  * @param upper The upper bound of the interval to search in
  *
- * @param tolerance The tolerance for the optimisation, used to
- * guide the stopping criteria (see above)
+ * @param control Control parameters for the optimisation
  *
  * @param maxIterations The maximum number of iterations of the
  * algorithm (calls to {@link Brent.step | `Brent.step()`}) to
@@ -22,9 +52,9 @@ import { checkResult, Result, TargetFn1 } from "./types";
  * @returns See {@link Brent.result | `Brent.result`} for details
  */
 export function fitBrent(target: TargetFn1, lower: number, upper: number,
-                         tolerance: number = 1e-6,
+                         control: Partial<BrentControlParam> = {},
                          maxIterations: number = Infinity) {
-    const solver = new Brent(target, lower, upper, tolerance);
+    const solver = new Brent(target, lower, upper, control);
     return solver.run(maxIterations);
 }
 
@@ -66,7 +96,7 @@ export function fitBrent(target: TargetFn1, lower: number, upper: number,
  */
 export class Brent {
     private readonly _target: TargetFn1;
-    private readonly _tolerance: number;
+    private readonly _control: BrentControlParam;
     private readonly _state: BrentState;
     private _converged: boolean = false;
     private _evaluations: number = 0;
@@ -78,13 +108,12 @@ export class Brent {
      *
      * @param upper The upper bound of the interval to search in
      *
-     * @param tolerance The tolerance for the optimisation, used to
-     * guide the stopping criteria (see above)
+     * @param control Control parameters for the optimisation
      */
     constructor(target: TargetFn1, lower: number, upper: number,
-                tolerance: number = 1e-6) {
-        this._target = target;
-        this._tolerance = tolerance;
+                control: Partial<BrentControlParam> = {}) {
+        this._control = brentControl(control);
+        this._target = this._control.findMax ? invert(target) : target;
         const m = lower + squaredInverseGoldenRatio * (upper - lower);
         const x = this._point(m);
         const w: Point1 = { ...x };
@@ -151,7 +180,7 @@ export class Brent {
             /** The best found location */
             location: best.location,
             /** The value of `target(location)` */
-            value: best.value,
+            value: this._control.findMax ? -best.value : best.value,
         };
     }
 
@@ -169,7 +198,8 @@ export class Brent {
         const state = this._state;
         const xm = (state.a + state.b) / 2;
         const x = state.x.location;
-        const tol1 = sqrtMachineEps * Math.abs(x) + this._tolerance / 3.0;
+        const tol1 = sqrtMachineEps * Math.abs(x) +
+            this._control.tolerance / 3.0;
         const tol2 = 2.0 * tol1;
 
         // Test to see if we've converged

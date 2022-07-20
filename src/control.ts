@@ -1,3 +1,5 @@
+import { withDefault } from "./utils";
+
 /**
  * Control for the Simplex. Only some of these (or, indeed none of
  * these) can be provided to {@link Simplex} or {@link fitSimplex}
@@ -52,8 +54,4 @@ export function simplexControl(control: Partial<SimplexControlParam> = {}) {
             "Invalid control parameter: 'tolerance' must be strictly positive");
     }
     return ret;
-}
-
-function withDefault<T>(x: T | undefined, y: T) {
-    return x === undefined ? y : x;
 }

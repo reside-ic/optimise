@@ -1,5 +1,6 @@
 import {simplexControl, SimplexControlParam} from "./control";
 import {checkResult, Point, Result, TargetFn} from "./types";
+import {protect} from "./utils";
 
 function weightedSum(w: number, v1: number[], v2: number[]) {
     const n = v1.length;
@@ -10,16 +11,6 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
         ret[j] = w1 * v1[j] + w2 * v2[j];
     }
     return ret;
-}
-
-function protect(target: TargetFn) {
-    return (location: number[]) => {
-        try {
-            return target(location);
-        } catch {
-            return Infinity;
-        }
-    };
 }
 
 /**
