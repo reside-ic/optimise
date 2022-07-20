@@ -1,15 +1,6 @@
-import { runBrent } from "../src/brent";
+import { Brent, runBrent } from "../src/brent";
 
 describe("finds a minimum", () => {
-    it("uses same points as R code", () => {
-        const parabola = (x: number) => {
-            console.log(x);
-            return x * x;
-        }
-
-        runBrent(parabola, -2, 2, 0.0001220703125);
-    });
-
     it("finds easy min", () => {
         const parabola = (x: number) => x * x;
         expect(runBrent(parabola, -3, 3).location).toBeCloseTo(0);
@@ -21,4 +12,44 @@ describe("finds a minimum", () => {
         const fn = (x: number) => -(x + Math.sin(x)) * Math.exp(-x * x);
         expect(runBrent(fn, -10, 10).location).toBeCloseTo(0.6795786640979207);
     });
-})
+
+    it("can fail to converge", () => {
+        const parabola = (x: number) => x * x;
+        const result = runBrent(parabola, -2, 2, 1e-6, 3);
+        expect(result.converged).toBe(false);
+    });
+});
+
+describe("lower-level interface provides more control", () => {
+    it("can be constructed", () => {
+        const parabola = (x: number) => x * x;
+        const solver = new Brent(parabola, -3, 3);
+        expect(solver.result().converged).toBe(false);
+        expect(solver.run(3).converged).toBe(false);
+        expect(solver.run().converged).toBe(true);
+        const res = solver.result();
+        expect(res.location).toBeCloseTo(0);
+        expect(res.value).toBeCloseTo(0);
+    });
+});
+
+describe("can accumulate additional information", () => {
+    // Same example as the simplex case but just optimising the slope
+    const x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const y = [0.54, 1.25, 1.44, 2.23, 2.59, 2.76, 3.41, 3.61, 4.32, 4.86];
+    function target(m: number) {
+        var value = 0;
+        for (var i = 0; i < x.length; ++i) {
+            value += (m * x[i] - y[i])**2;
+        }
+        const data = (x: number[]) => x.map((el: number) => m * el);
+        return {data, value};
+    }
+
+    var res = new Brent(target, 0, 10);
+    var ans = res.run(100);
+    expect(ans.converged).toBe(true);
+    expect(ans.location).toBeCloseTo(0.483168831168832);
+    expect(ans.data(x)).toEqual(
+        x.map((el: number) => ans.location * el));
+});
