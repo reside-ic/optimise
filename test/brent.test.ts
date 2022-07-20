@@ -1,21 +1,21 @@
-import { Brent, runBrent } from "../src/brent";
+import { Brent, fitBrent } from "../src/brent";
 
 describe("finds a minimum", () => {
     it("finds easy min", () => {
         const parabola = (x: number) => x * x;
-        expect(runBrent(parabola, -3, 3).location).toBeCloseTo(0);
-        expect(runBrent(parabola, -10, 3).location).toBeCloseTo(0);
-        expect(runBrent(parabola, 0, 3).location).toBeCloseTo(0);
+        expect(fitBrent(parabola, -3, 3).location).toBeCloseTo(0);
+        expect(fitBrent(parabola, -10, 3).location).toBeCloseTo(0);
+        expect(fitBrent(parabola, 0, 3).location).toBeCloseTo(0);
     });
 
     it("finds harder min", () => {
         const fn = (x: number) => -(x + Math.sin(x)) * Math.exp(-x * x);
-        expect(runBrent(fn, -10, 10).location).toBeCloseTo(0.6795786640979207);
+        expect(fitBrent(fn, -10, 10).location).toBeCloseTo(0.6795786640979207);
     });
 
     it("can fail to converge", () => {
         const parabola = (x: number) => x * x;
-        const result = runBrent(parabola, -2, 2, 1e-6, 3);
+        const result = fitBrent(parabola, -2, 2, 1e-6, 3);
         expect(result.converged).toBe(false);
     });
 });

@@ -21,7 +21,7 @@ import { checkResult, Result, TargetFn1 } from "./types";
  *
  * @returns See {@link Brent.result | `Brent.result`} for details
  */
-export function runBrent(target: TargetFn1, lower: number, upper: number,
+export function fitBrent(target: TargetFn1, lower: number, upper: number,
                          tolerance: number = 1e-6,
                          maxIterations: number = Infinity) {
     const solver = new Brent(target, lower, upper, tolerance);
@@ -35,7 +35,7 @@ export function runBrent(target: TargetFn1, lower: number, upper: number,
  *
  * Like {@link Simplex}, creating an object does not perform the
  * optimisation, but gives you an object that you can loop through
- * yourself. Use {@link runBrent} for a one-shot version.
+ * yourself. Use {@link fitBrent} for a one-shot version.
  *
  * The approach here comes from [Brent (1976) - Algorithms for
  * minimization without
