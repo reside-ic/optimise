@@ -25,7 +25,7 @@ function protect(target: TargetFn) {
 /**
  * Run the Simplex algorithm on a target function. This is a
  * convenience function and offers little control but a compact
- * interface.
+ * interface. For more control, use {@link Simplex} directly.
  *
  * @param target The function to be minimised
  *

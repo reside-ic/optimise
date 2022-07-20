@@ -60,6 +60,14 @@ export interface Point {
  */
 export type TargetFn = (location: number[]) => number | Result;
 
+/** A one dimensional function to be minimised, passed to {@link
+ * Brent}. This interface differs from the more general {@link
+ * TargetFn} in that `x` is a scalar number, and not an array of
+ * numbers. Other than that the interface is the same, including the
+ * optional rich return type.
+ */
+export type TargetFn1 = (location: number) => number | Result;
+
 export function checkResult(value: number | Result): Result {
     if (typeof value === "number") {
         return {
