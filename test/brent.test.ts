@@ -38,16 +38,16 @@ describe("can accumulate additional information", () => {
     const x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     const y = [0.54, 1.25, 1.44, 2.23, 2.59, 2.76, 3.41, 3.61, 4.32, 4.86];
     function target(m: number) {
-        var value = 0;
-        for (var i = 0; i < x.length; ++i) {
-            value += (m * x[i] - y[i])**2;
+        let value = 0;
+        for (let i = 0; i < x.length; ++i) {
+            value += (m * x[i] - y[i]) ** 2;
         }
-        const data = (x: number[]) => x.map((el: number) => m * el);
+        const data = (z: number[]) => z.map((el: number) => m * el);
         return {data, value};
     }
 
-    var res = new Brent(target, 0, 10);
-    var ans = res.run(100);
+    const res = new Brent(target, 0, 10);
+    const ans = res.run(100);
     expect(ans.converged).toBe(true);
     expect(ans.location).toBeCloseTo(0.483168831168832);
     expect(ans.data(x)).toEqual(
