@@ -1,5 +1,5 @@
 import { checkResult, Result, TargetFn1 } from "./types";
-import { invert, protect, withDefault } from "./utils";
+import { copysign, invert, protect, withDefault } from "./utils";
 
 /**
  * Control for the Brent algorithm. Only some of these (or, indeed none of
@@ -270,7 +270,7 @@ interface BrentState {
     v: Point1;
     /** Previous value of `x` */
     w: Point1;
-    /** Best value of `x` */
+    /** Best found location `x` */
     x: Point1;
 
     /** Previous value of 'e' */
@@ -338,9 +338,4 @@ function fitParabola(state: BrentState, tolerance: number): [number, number] {
         q = -q;
     }
     return [p, q];
-}
-
-// https://gcc.gnu.org/onlinedocs/gfortran/SIGN.html
-function copysign(a: number, b: number) {
-    return Math.sign(b) * a;
 }

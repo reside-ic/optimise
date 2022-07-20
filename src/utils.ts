@@ -31,3 +31,8 @@ export function invert<T>(target: (x: T) => number | Result) {
         return res;
     };
 }
+
+// https://gcc.gnu.org/onlinedocs/gfortran/SIGN.html
+export function copysign(a: number, b: number) {
+    return Math.sign(b) * a;
+}
