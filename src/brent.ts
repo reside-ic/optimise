@@ -51,7 +51,7 @@ export function runBrent(target: TargetFn1, lower: number, upper: number,
  * > continuous second derivative which is positive at the minimum
  * > (which is not at `lower` or `upper`), then convergence is
  * > superlinear, and usually of the order of about 1.324....
-
+ *
  * > the function `target` is never evaluated at two points closer
  * > together than `eps * abs(fmin) + (tolerance / 3)`, where `eps` is
  * > approximately the square root of the relative machine precision.
@@ -127,7 +127,7 @@ export class Brent {
                 }
             }
         }
-        return this.result()
+        return this.result();
     }
 
     /**
@@ -151,7 +151,7 @@ export class Brent {
             /** The best found location */
             location: best.location,
             /** The value of `target(location)` */
-            value: best.value
+            value: best.value,
         };
     }
 
@@ -177,7 +177,6 @@ export class Brent {
             return true;
         }
 
-        // Fit parabola
         const [p, q] = fitParabola(state, tol1);
 
         const useGoldenRatio =
@@ -195,9 +194,9 @@ export class Brent {
         } else { // Parabolic interpolation
             state.e = state.d;
             state.d = p / q;
-            const u = x + state.d; // candidate u for below
+            const uNext = x + state.d; // candidate u for below
             // f must not be evaluated too close to a or b (lower or upper)
-            if (u - state.a < tol2 || state.b - u < tol2) {
+            if (uNext - state.a < tol2 || state.b - uNext < tol2) {
                 state.d = x < xm ? tol1 : -tol1;
             }
         }
@@ -242,7 +241,7 @@ interface BrentState {
     /** Previous value of `x` */
     w: Point1;
     /** Best value of `x` */
-    x: Point1,
+    x: Point1;
 
     /** Previous value of 'e' */
     d: number;
@@ -255,6 +254,7 @@ interface BrentState {
 
 // Squared inverse of the golden ratio
 const squaredInverseGoldenRatio = 0.5 * (3 - Math.sqrt(5));
+
 // Square root of machine precision
 const sqrtMachineEps = Math.sqrt(Number.EPSILON);
 
@@ -290,12 +290,11 @@ function updateState(u: Point1, state: BrentState) {
 
 function fitParabola(state: BrentState, tolerance: number): [number, number] {
     if (Math.abs(state.e) <= tolerance) {
-        return [0, 0]
+        return [0, 0];
     }
     const x = state.x;
     const v = state.v;
     const w = state.w;
-    // Fit parabola
     let p = 0;
     let q = 0;
     let r = 0;
@@ -306,7 +305,7 @@ function fitParabola(state: BrentState, tolerance: number): [number, number] {
     if (q > 0) {
         p = -p;
     } else {
-        q = -q; // not in fmin?
+        q = -q;
     }
     return [p, q];
 }
