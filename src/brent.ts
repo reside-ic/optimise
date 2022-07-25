@@ -137,8 +137,8 @@ export class Brent {
     /**
      * Helper function to run the algorithm until converged. This is
      * very basic and not really intended to be used - you should
-     * probably build logic around {@link Simplex.step} directly, or if
-     * you want a simple interface use the {@link fitSimplex} function.
+     * probably build logic around {@link Brent.step} directly, or if
+     * you want a simple interface use the {@link fitBrent} function.
      *
      * @param maxIterations The maximum number of iterations of the
      * algorithm (calls to {@link Brent.step} to take. If we converge
