@@ -257,8 +257,8 @@ interface Point1 {
  * * `x` is the point visited with the lowest value of `target`
  * * `w` is the second lowest visited value of `target`
  * * `v` is the previous value of `w`
- * * `fx`, `fw` and `fv` are the values of `target` evaluated at `x`, `w`
- *   and `v` respectively.
+ * * The values `d` and `e` track the parabolic fit, used by the algorithm
+ *   to switch between bisection and interpolation.
  */
 interface BrentState {
     /** Current lower bound of the optimum */
