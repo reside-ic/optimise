@@ -34,3 +34,14 @@ export function invert<T>(target: (x: T) => number | Result) {
 export function copysign(a: number, b: number) {
     return Math.sign(b) * a;
 }
+
+export function weightedSum(w: number, v1: number[], v2: number[]) {
+    const n = v1.length;
+    const ret = new Array(n);
+    const w1 = 1 + w;
+    const w2 = -w;
+    for (let j = 0; j < ret.length; ++j) {
+        ret[j] = w1 * v1[j] + w2 * v2[j];
+    }
+    return ret;
+}
