@@ -1,4 +1,4 @@
-import { checkResult, Point, Result, TargetFn1 } from "./types";
+import { checkResult, Point, Result, TargetFn } from "./types";
 import { copysign, invert, protect, withDefault } from "./utils";
 
 /**
@@ -51,7 +51,7 @@ export function brentControl(control: Partial<BrentControlParam>) {
  *
  * @returns See {@link Brent.result | `Brent.result`} for details
  */
-export function fitBrent(target: TargetFn1, lower: number, upper: number,
+export function fitBrent(target: TargetFn<number>, lower: number, upper: number,
                          control: Partial<BrentControlParam> = {},
                          maxIterations: number = Infinity) {
     const solver = new Brent(target, lower, upper, control);
@@ -95,7 +95,7 @@ export function fitBrent(target: TargetFn1, lower: number, upper: number,
  * > to the same accuracy.
  */
 export class Brent {
-    private readonly _target: TargetFn1;
+    private readonly _target: TargetFn<number>;
     private readonly _control: BrentControlParam;
     private readonly _state: BrentState;
     private _converged: boolean = false;
@@ -110,7 +110,7 @@ export class Brent {
      *
      * @param control Control parameters for the optimisation
      */
-    constructor(target: TargetFn1, lower: number, upper: number,
+    constructor(target: TargetFn<number>, lower: number, upper: number,
                 control: Partial<BrentControlParam> = {}) {
         this._control = brentControl(control);
         this._target = this._control.findMax ? invert(target) : target;

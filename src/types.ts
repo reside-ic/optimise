@@ -27,11 +27,16 @@ export interface Point<T> {
 }
 
 /**
- * The interface that a function to be minimised, passed to {@link
- * Simplex} must satisfy. Your function must accept a vector of
- * numbers (the point in n-dimensional space) and return either a
- * number (the objective value) or {@link Result} (a rich result type
- * that includes the objective value and additional information).
+ * The interface that a function to be minimised must satisfy.
+ *
+ * * For {@link Simplex}, `T` should be `number[]` representing a
+ *   point in n-dimensional space
+ * * For {@link Brent}, `T` should be `number` representing a single
+ *   real value
+ *
+ * For both, the return value must either be a number (the objective
+ * value to be minimised) or {@link Result} (a rich result type that
+ * includes the objective value and additional information; see below).
  *
  * @remarks
  *
@@ -68,15 +73,7 @@ export interface Point<T> {
  * @return result The value of the target function at `location`,
  * either as a simple number or a rich {@link Result} type
  */
-export type TargetFn = (location: number[]) => number | Result;
-
-/** A one dimensional function to be minimised, passed to {@link
- * Brent}. This interface differs from the more general {@link
- * TargetFn} in that `x` is a scalar number, and not an array of
- * numbers. Other than that the interface is the same, including the
- * optional rich return type.
- */
-export type TargetFn1 = (location: number) => number | Result;
+export type TargetFn<T> = (location: T) => number | Result;
 
 export function checkResult(value: number | Result): Result {
     if (typeof value === "number") {

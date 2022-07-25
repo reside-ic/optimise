@@ -33,7 +33,7 @@ function weightedSum(w: number, v1: number[], v2: number[]) {
  *
  * @returns See {@link Simplex.result | `Simplex.result`} for details
  */
-export function fitSimplex(target: TargetFn, location: number[],
+export function fitSimplex(target: TargetFn<number[]>, location: number[],
                            control: Partial<SimplexControlParam> = {},
                            maxIterations: number = 200) {
     const solver = new Simplex(target, location, control);
@@ -74,7 +74,7 @@ export class Simplex {
     private readonly psi = -0.5;
     private readonly sigma = 0.5;
 
-    private _target: TargetFn;
+    private _target: TargetFn<number[]>;
     private _control: SimplexControlParam;
     private _simplex: Array<Point<number[]>>;
     private _n: number;
@@ -90,7 +90,7 @@ export class Simplex {
      *
      * @param control Control parameters, as an object
      */
-    constructor(target: TargetFn, location: number[],
+    constructor(target: TargetFn<number[]>, location: number[],
                 control: Partial<SimplexControlParam> = {}) {
         this._target = target;
         this._control = simplexControl(control);

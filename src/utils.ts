@@ -17,12 +17,10 @@ export function protect<T, U>(target: (x: T) => number | U) {
 /** Invert a target function, allowing maximisation of an objective
  * function rather than minimising.
  *
- * @param target A function conforming to {@link TargetFn} or {@link
- * TargetFn1}
+ * @param target A function conforming to {@link TargetFn}
  *
  * @return Another function that can be passed through to {@link
- * Simplex} (if `target` was {@link TargetFn}) or {@link Brent} (if
- * `target` was {@link TargetFn1})
+ * Simplex} or {@link Brent}
  */
 export function invert<T>(target: (x: T) => number | Result) {
     return (x: T) => {
