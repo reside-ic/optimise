@@ -9,10 +9,20 @@ export interface Result {
     value: number;
 }
 
-export interface Point {
+/**
+ * A point visited by an optimiser
+ */
+export interface Point<T> {
+    /**
+     * Any additional value returned by the target function
+     * (see {@link @Result})
+     */
     data: any;
+    /** A unique identifier for the point */
     id: number;
-    location: number[];
+    /** The location in the problem space */
+    location: T;
+    /** The value of the target function at this point */
     value: number;
 }
 

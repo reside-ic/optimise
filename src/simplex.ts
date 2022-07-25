@@ -76,7 +76,7 @@ export class Simplex {
 
     private _target: TargetFn;
     private _control: SimplexControlParam;
-    private _simplex: Point[];
+    private _simplex: Array<Point<number[]>>;
     private _n: number;
 
     private _iterations: number = 0;
@@ -234,7 +234,7 @@ export class Simplex {
             (el) => ({location: el.location, value: el.value}));
     }
 
-    private _point(location: number[]): Point {
+    private _point(location: number[]): Point<number[]> {
         const result = checkResult(this._target(location));
         return {
             data: result.data,
@@ -261,30 +261,30 @@ export class Simplex {
         return ret;
     }
 
-    private _update(other: Point) {
+    private _update(other: Point<number[]>) {
         this._simplex[this._n] = other;
         this._sort();
     }
 
     // Various "moves"
-    private _reflect(point: Point, centroid: number[]) {
+    private _reflect(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(this.rho, centroid, point.location));
     }
 
-    private _expand(point: Point, centroid: number[]) {
+    private _expand(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(this.chi, centroid, point.location));
     }
 
-    private _contractInside(point: Point, centroid: number[]) {
+    private _contractInside(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(this.psi, centroid, point.location));
     }
 
-    private _contractOutside(point: Point, centroid: number[]) {
+    private _contractOutside(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(-this.psi * this.rho,
                                        centroid, point.location));
     }
 
-    private _shrink(point: Point, best: number[]) {
+    private _shrink(point: Point<number[]>, best: number[]) {
         return this._point(weightedSum(-this.sigma, best, point.location));
     }
 

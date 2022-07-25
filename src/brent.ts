@@ -1,4 +1,4 @@
-import { checkResult, Result, TargetFn1 } from "./types";
+import { checkResult, Point, Result, TargetFn1 } from "./types";
 import { copysign, invert, protect, withDefault } from "./utils";
 
 /**
@@ -116,8 +116,8 @@ export class Brent {
         this._target = this._control.findMax ? invert(target) : target;
         const m = lower + squaredInverseGoldenRatio * (upper - lower);
         const x = this._point(m);
-        const w: Point1 = { ...x };
-        const v: Point1 = { ...x };
+        const w: Point<number> = { ...x };
+        const v: Point<number> = { ...x };
         this._state = {a: lower, b: upper, v, w, x, d: 0, e: 0};
     }
 
@@ -184,11 +184,12 @@ export class Brent {
         };
     }
 
-    private _point(location: number): Point1 {
+    private _point(location: number): Point<number> {
         this._evaluations++;
         const result = checkResult(this._target(location));
         return {
             data: result.data,
+            id: this._evaluations,
             location,
             value: result.value,
         };
@@ -240,12 +241,6 @@ export class Brent {
     }
 }
 
-interface Point1 {
-    readonly data: any;
-    readonly location: number;
-    readonly value: number;
-}
-
 /**
  * See p 73 of the book
  *
@@ -267,11 +262,11 @@ interface BrentState {
     b: number;
 
     /** Previous value of `w` */
-    v: Point1;
+    v: Point<number>;
     /** Previous value of `x` */
-    w: Point1;
+    w: Point<number>;
     /** Best found location `x` */
-    x: Point1;
+    x: Point<number>;
 
     /** Previous value of 'e' */
     d: number;
@@ -288,7 +283,7 @@ const squaredInverseGoldenRatio = 0.5 * (3 - Math.sqrt(5));
 // Square root of machine precision
 const sqrtMachineEps = Math.sqrt(Number.EPSILON);
 
-function updateState(u: Point1, state: BrentState) {
+function updateState(u: Point<number>, state: BrentState) {
     const x = state.x;
     const w = state.w;
     const v = state.v;

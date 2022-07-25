@@ -17,7 +17,7 @@ describe("validate control", () => {
     it("requires positive tolerance", () => {
         expect(() => brentControl({tolerance: 0}))
             .toThrow("Invalid control parameter: 'tolerance' must be strictly positive");
-    })
+    });
 });
 
 describe("finds a minimum", () => {
