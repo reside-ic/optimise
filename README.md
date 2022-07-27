@@ -4,7 +4,7 @@
 [![build-and-test](https://github.com/reside-ic/dfoptim/actions/workflows/ci.yml/badge.svg)](https://github.com/reside-ic/dfoptim/actions/workflows/ci.yml)
 [![codecov.io](https://codecov.io/github/reside-ic/dfoptim/coverage.svg?branch=main)](https://codecov.io/github/reside-ic/dfoptim?branch=main)
 
-Very simple optimisation, using the [Simplex (Nelder-Mead) method](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method)
+Very simple optimisation, using the [Simplex (Nelder-Mead) method](https://en.wikipedia.org/wiki/Nelder%E2%80%93Mead_method) or [Brent's method](https://github.com/osveliz/numerical-veliz/wiki/Brent's-Minimization-Method) (for single-variable functions).
 
 We provide two interfaces. In the first, you can dfoptim a function in a single go:
 
@@ -29,6 +29,8 @@ Where
 * `opt` is our optimiser. At this point, it has done basic set up (creating the first simplex) but not taken any steps
 * The `step()` method advances the algorithm one step, which will take one or two evaluations of the target function and may or may not find a better point than our current best. It returns `true` if we have converged.
 * The `result()` method returns information about the best point.
+
+The same pair of interfaces is provided for the Brent's method via `dfoptim.fitBrent` and `dfoptim.Brent`.
 
 ## Example
 

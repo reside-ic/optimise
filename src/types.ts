@@ -9,19 +9,34 @@ export interface Result {
     value: number;
 }
 
-export interface Point {
+/**
+ * A point visited by an optimiser
+ */
+export interface Point<T> {
+    /**
+     * Any additional value returned by the target function
+     * (see {@link @Result})
+     */
     data: any;
+    /** A unique identifier for the point */
     id: number;
-    location: number[];
+    /** The location in the problem space */
+    location: T;
+    /** The value of the target function at this point */
     value: number;
 }
 
 /**
- * The interface that a function to be minimised, passed to {@link
- * Simplex} must satisfy. Your function must accept a vector of
- * numbers (the point in n-dimensional space) and return either a
- * number (the objective value) or {@link Result} (a rich result type
- * that includes the objective value and additional information).
+ * The interface that a function to be minimised must satisfy.
+ *
+ * * For {@link Simplex}, `T` should be `number[]` representing a
+ *   point in n-dimensional space
+ * * For {@link Brent}, `T` should be `number` representing a single
+ *   real value
+ *
+ * For both, the return value must either be a number (the objective
+ * value to be minimised) or {@link Result} (a rich result type that
+ * includes the objective value and additional information; see below).
  *
  * @remarks
  *
@@ -58,7 +73,7 @@ export interface Point {
  * @return result The value of the target function at `location`,
  * either as a simple number or a rich {@link Result} type
  */
-export type TargetFn = (location: number[]) => number | Result;
+export type TargetFn<T> = (location: T) => number | Result;
 
 export function checkResult(value: number | Result): Result {
     if (typeof value === "number") {

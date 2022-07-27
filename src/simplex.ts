@@ -1,31 +1,66 @@
-import {simplexControl, SimplexControlParam} from "./control";
-import {checkResult, Point, Result, TargetFn} from "./types";
+import { checkResult, Point, Result, TargetFn } from "./types";
+import { protect, weightedSum, withDefault } from "./utils";
 
-function weightedSum(w: number, v1: number[], v2: number[]) {
-    const n = v1.length;
-    const ret = new Array(n);
-    const w1 = 1 + w;
-    const w2 = -w;
-    for (let j = 0; j < ret.length; ++j) {
-        ret[j] = w1 * v1[j] + w2 * v2[j];
-    }
-    return ret;
+/**
+ * Control for the Simplex. Only some of these (or, indeed none of
+ * these) can be provided to {@link Simplex} or {@link fitSimplex}
+ */
+export interface SimplexControlParam {
+    /** Multiplicative change for nonzero parameters when constructing
+     *  the initial simplex, default is 0.05. If a starting point has
+     *  a nonzero value `x` for some dimension, then the value will be
+     *  perturbed to `x * (1 + deltaNonZero)`
+     */
+    deltaNonZero: number;
+    /** Absolute change for zero parameters when constructing the
+     *  initial simplex, default is 0.001. If a starting point has a
+     *  zero value `x` for some dimension then this value will be
+     *  perturbed to `deltaZero`
+     */
+    deltaZero: number;
+
+    /** Should we raise an error if the target function fails? If
+     *  `true` then any error in the target function is propagated out
+     *  from the solver, while if `false` then failure in the target
+     *  function is converted into a return value of `-Infinity` (this
+     *  is the default behaviour). The default behaviour is designed
+     *  for use for functions where some parameters may not make
+     *  sense, and can be used to implement bounded optimisation by
+     *  raising an error if the parameters are unsuitable.
+     */
+    errorOnFailure: boolean;
+    /** Tolerance used in the convergence heuristics. Default is
+     *  1e-5. Setting this value too small is likely to result in
+     *  issues with floating point arithmetic, or very slow
+     *  convergence in the final steps.
+     */
+    tolerance: number;
 }
 
-function protect(target: TargetFn) {
-    return (location: number[]) => {
-        try {
-            return target(location);
-        } catch {
-            return Infinity;
-        }
+export function simplexControl(control: Partial<SimplexControlParam> = {}) {
+    const defaults = {
+        deltaNonZero: 0.05,
+        deltaZero: 0.001,
+        errorOnFailure: false,
+        tolerance: 1e-5,
     };
+    const ret = {
+        deltaNonZero: withDefault(control.deltaNonZero, defaults.deltaNonZero),
+        deltaZero: withDefault(control.deltaZero, defaults.deltaZero),
+        errorOnFailure: withDefault(control.errorOnFailure, defaults.errorOnFailure),
+        tolerance: withDefault(control.tolerance, defaults.tolerance),
+    };
+    if (ret.tolerance <= 0) {
+        throw new Error(
+            "Invalid control parameter: 'tolerance' must be strictly positive");
+    }
+    return ret;
 }
 
 /**
  * Run the Simplex algorithm on a target function. This is a
  * convenience function and offers little control but a compact
- * interface.
+ * interface. For more control, use {@link Simplex} directly.
  *
  * @param target The function to be minimised
  *
@@ -42,7 +77,7 @@ function protect(target: TargetFn) {
  *
  * @returns See {@link Simplex.result | `Simplex.result`} for details
  */
-export function fitSimplex(target: TargetFn, location: number[],
+export function fitSimplex(target: TargetFn<number[]>, location: number[],
                            control: Partial<SimplexControlParam> = {},
                            maxIterations: number = 200) {
     const solver = new Simplex(target, location, control);
@@ -83,9 +118,9 @@ export class Simplex {
     private readonly psi = -0.5;
     private readonly sigma = 0.5;
 
-    private _target: TargetFn;
+    private _target: TargetFn<number[]>;
     private _control: SimplexControlParam;
-    private _simplex: Point[];
+    private _simplex: Array<Point<number[]>>;
     private _n: number;
 
     private _iterations: number = 0;
@@ -99,7 +134,7 @@ export class Simplex {
      *
      * @param control Control parameters, as an object
      */
-    constructor(target: TargetFn, location: number[],
+    constructor(target: TargetFn<number[]>, location: number[],
                 control: Partial<SimplexControlParam> = {}) {
         this._target = target;
         this._control = simplexControl(control);
@@ -243,7 +278,7 @@ export class Simplex {
             (el) => ({location: el.location, value: el.value}));
     }
 
-    private _point(location: number[]): Point {
+    private _point(location: number[]): Point<number[]> {
         const result = checkResult(this._target(location));
         return {
             data: result.data,
@@ -270,30 +305,30 @@ export class Simplex {
         return ret;
     }
 
-    private _update(other: Point) {
+    private _update(other: Point<number[]>) {
         this._simplex[this._n] = other;
         this._sort();
     }
 
     // Various "moves"
-    private _reflect(point: Point, centroid: number[]) {
+    private _reflect(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(this.rho, centroid, point.location));
     }
 
-    private _expand(point: Point, centroid: number[]) {
+    private _expand(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(this.chi, centroid, point.location));
     }
 
-    private _contractInside(point: Point, centroid: number[]) {
+    private _contractInside(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(this.psi, centroid, point.location));
     }
 
-    private _contractOutside(point: Point, centroid: number[]) {
+    private _contractOutside(point: Point<number[]>, centroid: number[]) {
         return this._point(weightedSum(-this.psi * this.rho,
                                        centroid, point.location));
     }
 
-    private _shrink(point: Point, best: number[]) {
+    private _shrink(point: Point<number[]>, best: number[]) {
         return this._point(weightedSum(-this.sigma, best, point.location));
     }
 
